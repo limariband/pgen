@@ -2,25 +2,19 @@ import sys
 import string
 import numpy as np
 
-def setup(opt, fg=0, var=1, sp=[]):
+
+def setup(opt, fg=0, var=1):
     sp = [
         string.ascii_uppercase,
         string.ascii_lowercase,
         string.digits,
         string.punctuation,
     ]
-    
-    if 'u' in opt:
-        fg+=1
-    
-    if 'l' in opt:
-        fg+=2
-    
-    if 'd' in opt:
-        fg+=4
 
-    if 'p' in opt:
-        fg+=8
+    fd = {'u':1, 'l':2, 'd':4, 'p':8,}
+    
+    for item in opt:
+        fg += fd.get(item, 0)
 
     for item in sp.copy():
         f = fg & var
