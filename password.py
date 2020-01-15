@@ -44,7 +44,7 @@ def set_weight(arg):
     return wg
 
 
-def random_choice(arg, weight=None):
+def random_choice(arg, weight):
     gr = np.random.choice(arg, 1, p=weight)
     cr = np.random.choice(list(*gr))
 
@@ -65,13 +65,9 @@ def set_options(opt, l=8, m=''):
     return l, m
 
 
-def main(pw='', pwl=[]):
-    lenght, mode = set_options(sys.argv[1:])
-    universe = setup(mode)
-    weight = set_weight(universe)
-
-    for i in range(lenght):
-        pwl.append(random_choice(universe, weight))
+def main(lg, un, wg, pw='', pwl=[]):
+    for i in range(lg):
+        pwl.append(random_choice(un, wg))
 
     pw = pw.join(pwl)
   
@@ -79,5 +75,8 @@ def main(pw='', pwl=[]):
 
 
 if __name__ == '__main__':
-    password = main()
+    lenght, mode = set_options(sys.argv[1:])
+    universe = setup(mode)
+    weight = set_weight(universe)
+    password = main(lenght, universe, weight)
     print(password)
