@@ -38,8 +38,8 @@ def set_weight(arg):
     return wg
 
 
-def random_choice(arg, weight):
-    gr = np.random.choice(arg, 1, p=weight)
+def random_choice(arg, wght):
+    gr = np.random.choice(arg, 1, p=wght)
     cr = np.random.choice(list(*gr))
 
     return cr
