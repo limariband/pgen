@@ -27,13 +27,13 @@ def setup(opt, fg=0, var=1):
 
 def set_weight(arg):
     if len(arg) == 4:
-        wg = [0.35, 0.35, 0.15, 0.15]
+        wg = (0.35, 0.35, 0.15, 0.15)
     elif len(arg) == 3:
-        wg = [0.5, 0.3, 0.2]
+        wg = (0.5, 0.3, 0.2)
     elif len(arg) == 2:
-        wg = [0.7, 0.3]
+        wg = (0.7, 0.3)
     else:
-        wg = [1]
+        wg = (1)
 
     return wg
 
