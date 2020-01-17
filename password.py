@@ -1,6 +1,38 @@
+import string
 import sys
 import string
+
 import numpy as np
+
+
+def verify(passw, univ, vrf=None):
+    if vrf is None:
+        vrf = {}
+
+    for item in univ:        
+        if item[0].islower():
+            vrf.update({'l':0})
+        elif item[0].isupper():
+            vrf.update({'u':0})
+        elif item[0].isdigit():
+            vrf.update({'d':0})
+        else:
+            vrf.update({'p':0})
+
+    for char in passw:
+        if char.islower():
+            vrf['l'] += 1
+        elif char.isupper():
+            vrf['u'] += 1
+        elif char.isdigit():
+            vrf['d'] += 1
+        else:
+            vrf['p'] += 1
+    
+    if all([bool(x) for x in vrf.values()]):
+        return False
+    else:
+        return True
 
 
 def setup(opt, fg=0, var=1):
@@ -20,20 +52,20 @@ def setup(opt, fg=0, var=1):
         f = fg & var
         if f != 0:
             sp.remove(item)
-        var = var << 1
+        var <<= 1
     
     return sp
 
 
 def set_weight(arg):
     if len(arg) == 4:
-        wg = (0.35, 0.35, 0.15, 0.15)
+        wg = [0.35, 0.35, 0.15, 0.15]
     elif len(arg) == 3:
-        wg = (0.5, 0.3, 0.2)
+        wg = [0.5, 0.3, 0.2]
     elif len(arg) == 2:
-        wg = (0.7, 0.3)
+        wg = [0.7, 0.3]
     else:
-        wg = (1)
+        wg = [1]
 
     return wg
 
@@ -59,7 +91,10 @@ def set_options(opt, l=8, m=''):
     return l, m
 
 
-def main(lg, un, wg, pw='', pwl=[]):
+def main(lg, un, wg, pw=None, pwl=None):
+    if any([True for x in [pw, pwl] if x is None]):
+        pw, pwl = '', []
+    
     for i in range(lg):
         pwl.append(random_choice(un, wg))
 
@@ -69,8 +104,16 @@ def main(lg, un, wg, pw='', pwl=[]):
 
 
 if __name__ == '__main__':
+
     lenght, mode = set_options(sys.argv[1:])
     universe = setup(mode)
     weight = set_weight(universe)
+
     password = main(lenght, universe, weight)
+    verification = verify(password, universe)
+
+    while verification:
+        password = main(lenght, universe, weight)
+        verification = verify(password, universe)
+
     print(password)
