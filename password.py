@@ -108,12 +108,9 @@ if __name__ == '__main__':
     lenght, mode = set_options(sys.argv[1:])
     universe = setup(mode)
     weight = set_weight(universe)
-
     password = main(lenght, universe, weight)
-    verification = verify(password, universe)
 
-    while verification:
+    while (verification := verify(password, universe)):
         password = main(lenght, universe, weight)
-        verification = verify(password, universe)
 
     print(password)
