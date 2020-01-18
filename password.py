@@ -29,10 +29,9 @@ def verify(passw, univ, vrf=None):
         else:
             vrf['p'] += 1
     
-    if all([bool(x) for x in vrf.values()]):
-        return False
-    else:
-        return True
+    ver = not all([bool(x) for x in vrf.values()])
+    
+    return ver
 
 
 def setup(opt, fg=0, var=1):
