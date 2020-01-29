@@ -1,115 +1,98 @@
 import string
-import sys
-import string
-
+import click
 import numpy as np
 
 
-def verify(passw, univ, vrf=None):
-    if vrf is None:
-        vrf = {}
-
-    for item in univ:        
-        if item[0].islower():
-            vrf.update({'l':0})
-        elif item[0].isupper():
-            vrf.update({'u':0})
-        elif item[0].isdigit():
-            vrf.update({'d':0})
-        else:
-            vrf.update({'p':0})
-
-    for char in passw:
-        if char.islower():
-            vrf['l'] += 1
-        elif char.isupper():
-            vrf['u'] += 1
-        elif char.isdigit():
-            vrf['d'] += 1
-        else:
-            vrf['p'] += 1
-    
-    ver = not all([bool(x) for x in vrf.values()])
-    
-    return ver
-
-
-def setup(opt, fg=0, var=1):
-    sp = [
+def setup(digit, upper, lower, punct):
+    stp = [
         string.ascii_uppercase,
         string.ascii_lowercase,
         string.digits,
-        string.punctuation,
+        string.punctuation, 
     ]
 
-    fd = {'u':1, 'l':2, 'd':4, 'p':8,}
-    
-    for item in opt:
-        fg += fd.get(item, 0)
-
-    for item in sp.copy():
-        f = fg & var
-        if f != 0:
-            sp.remove(item)
-        var <<= 1
-    
-    return sp
+    if digit:
+        stp.remove(string.digits)    
+    if upper:
+        stp.remove(string.ascii_uppercase)
+    if lower:
+        stp.remove(string.ascii_lowercase)    
+    if punct:
+        stp.remove(string.punctuation)
+    return stp
 
 
-def set_weight(arg):
-    if len(arg) == 4:
-        wg = [0.35, 0.35, 0.15, 0.15]
-    elif len(arg) == 3:
-        wg = [0.5, 0.3, 0.2]
-    elif len(arg) == 2:
-        wg = [0.7, 0.3]
+def set_weight(args):
+    if len(args) == 4:
+        weight = [0.35, 0.35, 0.15, 0.15]
+    elif len(args) == 3:
+        weight = [0.5, 0.3, 0.2]
+    elif len(args) == 2:
+        weight = [0.7, 0.3]
     else:
-        wg = [1]
-
-    return wg
-
-
-def random_choice(arg, wght):
-    gr = np.random.choice(arg, 1, p=wght)
-    cr = np.random.choice(list(*gr))
-
-    return cr
+        weight = [1]
+    return weight
 
 
-def set_options(opt, l=8, m=''):
-    if any([x.startswith('-t') for x in opt]):
-        pre = list(filter(lambda x: x.startswith('-t'), opt))
-        l = int(pre[0].split('-t')[1])
-        opt.remove(*pre)
+def verify(password, universe):
+    v = {}
+    for item in universe:        
+        if item[0].islower():
+            v.update({'l':0})
+        elif item[0].isupper():
+            v.update({'u':0})
+        elif item[0].isdigit():
+            v.update({'d':0})
+        else:
+            v.update({'p':0})
+
+    for char in password:
+        if char.islower():
+            v['l'] += 1
+        elif char.isupper():
+            v['u'] += 1
+        elif char.isdigit():
+            v['d'] += 1
+        else:
+            v['p'] += 1
     
-    if any([x.startswith('-') for x in opt]):
-        pre = list(filter(lambda x: x.startswith('-'), opt))
-        m = pre[0].split('-')[1]
-        opt.remove(*pre)
-
-    return l, m
+    flag = not all([bool(x) for x in v.values()])    
+    return flag
 
 
-def main(lg, un, wg, pw=None, pwl=None):
-    if any([True for x in [pw, pwl] if x is None]):
-        pw, pwl = '', []
-    
-    for i in range(lg):
-        pwl.append(random_choice(un, wg))
+def set_password(context, lenght, weigth):
+    password = ''
+    for i in range(lenght):
+        password += random_choice(context, weigth)
+    return password
 
-    pw = pw.join(pwl)
-  
-    return pw
+
+def random_choice(args, weight):
+    group = np.random.choice(args, 1, p=weight)
+    character = np.random.choice(list(*group))
+    return character
+
+
+@click.command(context_settings={'help_option_names':['-h','--help']})
+@click.version_option('1.0.0')
+@click.option('--lenght', type=int, default=8, 
+    show_default=True, help='Password lenght')
+@click.option('-d', '--no-digit', is_flag=True,
+    default=False, help='Password is generated without numbers')
+@click.option('-u', '--no-upper', is_flag=True,
+    default=False, help='Password is generated without uppercases')
+@click.option('-l', '--no-lower', is_flag=True,
+    default=False, help='Password is generated without lowercases')
+@click.option('-p', '--no-punct', is_flag=True,
+    default=False, help='Password is generated without punctuation')
+def get_password(lenght, no_digit, no_upper, no_lower, no_punct):
+    uni = setup(no_digit, no_upper, no_lower, no_punct)
+    wgt = set_weight(uni)
+    pwd = set_password(uni, lenght, wgt)
+    while (verification:=verify(pwd, uni)):
+        pwd = set_password(uni, lenght, wgt)
+    print(pwd)
 
 
 if __name__ == '__main__':
-
-    lenght, mode = set_options(sys.argv[1:])
-    universe = setup(mode)
-    weight = set_weight(universe)
-    password = main(lenght, universe, weight)
-
-    while (verification := verify(password, universe)):
-        password = main(lenght, universe, weight)
-
-    print(password)
+    get_password()
