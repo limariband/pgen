@@ -4,21 +4,27 @@ import numpy as np
 
 
 def setup(digit, upper, lower, punct):
+
+    lowercase = string.ascii_lowercase
+    uppercase = string.ascii_uppercase
+    digits = string.digits
+    punctuation = '!#$%&*+-.?@_'
+
     stp = [
-        string.ascii_uppercase,
-        string.ascii_lowercase,
-        string.digits,
-        string.punctuation, 
+        uppercase,
+        lowercase,
+        digits,
+        punctuation, 
     ]
 
     if digit:
-        stp.remove(string.digits)    
+        stp.remove(digits)    
     if upper:
-        stp.remove(string.ascii_uppercase)
+        stp.remove(ascii_uppercase)
     if lower:
-        stp.remove(string.ascii_lowercase)    
+        stp.remove(ascii_lowercase)    
     if punct:
-        stp.remove(string.punctuation)
+        stp.remove(punctuation)
     return stp
 
 
